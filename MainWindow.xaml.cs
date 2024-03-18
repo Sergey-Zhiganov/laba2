@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -24,10 +24,12 @@ namespace laba1
     public partial class MainWindow : Window
     {
         StudentsTableAdapter students = new StudentsTableAdapter();
+        GroupsTableAdapter groups = new GroupsTableAdapter();
         public MainWindow()
         {
             InitializeComponent();
             up01DataGrid.ItemsSource = students.GetData();
+            Group_IDText.ItemsSource = groups.GetData();
             Window1 window1 = new Window1();
             //window1.Show();
         }
@@ -39,7 +41,7 @@ namespace laba1
                 SurnameText.Text = selected["Surname"].ToString();
                 FirstnameText.Text = selected["Fistname"].ToString();
                 MiddleNameText.Text = selected["MiddleName"].ToString();
-                Group_IDText.Text = selected["Group_ID"].ToString();
+                Group_IDText.Text = groups.GetData()[Convert.ToInt32(students.GetData()[up01DataGrid.SelectedIndex][4]) - 1].Title;
             }
             else
             {
@@ -53,10 +55,12 @@ namespace laba1
         {
             try
             {
-                students.Insert1(SurnameText.Text, FirstnameText.Text, MiddleNameText.Text, Convert.ToInt32(Group_IDText.Text));
+                students.Insert1(SurnameText.Text, FirstnameText.Text, MiddleNameText.Text, Group_IDText.SelectedIndex + 1);
                 up01DataGrid.ItemsSource = students.GetData();
             }
-            catch { }
+            catch (Exception ex) {
+                MessageBox.Show($"Ошибка: {ex.Message}");
+            }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -64,20 +68,26 @@ namespace laba1
             try
             {
                 Students student = up01DataGrid.SelectedItem as Students;
-                students.Update1(SurnameText.Text, FirstnameText.Text, MiddleNameText.Text, Convert.ToInt32(MiddleNameText.Text), student.ID_Student);
+                students.Update1(SurnameText.Text, FirstnameText.Text, MiddleNameText.Text, Group_IDText.SelectedIndex + 1, student.ID_Student);
                 up01DataGrid.ItemsSource = students.GetData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}");
+            }
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             try
             {
-                students.Delete1((up01DataGrid.SelectedItem as Students).ID_Student);
+                students.Delete1(Convert.ToInt32(students.GetData()[up01DataGrid.SelectedIndex][0]));
                 up01DataGrid.ItemsSource = students.GetData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}");
+            }
         }
     }
 }
